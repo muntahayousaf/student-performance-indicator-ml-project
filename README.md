@@ -1,57 +1,67 @@
-# student-performance-indicator-ml-project
+# Student Math Score Prediction Project 🎯
 
-📊 Student Performance Indicator (ML Project)
+## 📌 Overview
+This project predicts a student's **Math Score** based on other academic features using **machine learning**.  
+It demonstrates an **end-to-end workflow**, from data preprocessing to model deployment via **Streamlit**.
 
-📌 Overview
+**Achieved Model Performance:**  
+- **Linear Regression** with **88% accuracy (R²)** on the test set.
 
-This project aims to predict student performance (test scores) based on various demographic and educational factors. By applying Linear Regression, the project identifies how features such as gender, ethnicity, parental education, lunch type, and test preparation course affect student outcomes.
 
-🎯 Objectives
-
-Understand the relationship between demographic/academic features and test scores.
-
-Apply Linear Regression for prediction.
-
-Perform Exploratory Data Analysis (EDA) to discover key insights.
-
-Achieve a reliable model for predicting student performance.
-
-⚙️ Tech Stack
-
-Python 🐍
-
-Libraries: Pandas, NumPy, Matplotlib, Seaborn, Scikit-learn
-
-Jupyter Notebook for analysis and modeling
-
-🔍 Dataset
-
+## Dataset
 The dataset contains student information including:
 
-Gender
+| Feature | Description |
+|---------|-------------|
+| gender | Student's gender |
+| race/ethnicity | Student's race/ethnicity group |
+| parental level of education | Highest education level of the student's parent |
+| lunch | Type of lunch (standard / free-reduced) |
+| test preparation course | Completed or none |
+| reading score | Reading exam score |
+| writing score | Writing exam score |
+| math score | Math exam score (Target variable) |
 
-Ethnicity
+**Notes:**  
+- Contains both **categorical** and **numerical** features.  
 
-Parental level of education
+---
 
-Lunch type
+## Data Preprocessing
 
-Test preparation course
+### 1. Categorical Encoding
+- Categorical features (`gender`, `race/ethnicity`, `parental level of education`, `lunch`, `test preparation course`) were encoded using **One-Hot Encoding**.  
+- `drop='first'` was applied to avoid multicollinearity.
 
-Test scores
+### 2. Feature Scaling
+- Numerical features (`reading score`, `writing score`) were scaled using **StandardScaler** to normalize the data.
 
-🛠️ Workflow
+### 3. Final Features
+- Encoded categorical features + scaled numerical features combined into the final dataset for training.
 
-Data Preprocessing – Handling missing values, encoding categorical variables
+---
 
-EDA (Exploratory Data Analysis) – Correlation heatmaps, feature distributions
+## Model Selection
+- Multiple regression models were evaluated:  
+  - Linear Regression  
+  - Lasso Regression  
+  - Ridge Regression  
+  - Decision Tree Regressor  
+  - Random Forest Regressor  
+  - K-Neighbors Regressor  
+  - XGBoost Regressor  
+  - CatBoost Regressor  
+  - AdaBoost Regressor  
 
-Feature Engineering – Selecting important predictors
+- Evaluation Metrics: **RMSE, MAE, R²**  
+- **Best Model:** Linear Regression with **R² = 0.88** on test data.
 
-Model Training – Linear Regression using Scikit-learn
+---
 
-Model Evaluation – Checking accuracy and regression metrics
+## Deployment with Streamlit
+- The trained model, **OneHotEncoder**, and **StandardScaler** were saved using **pickle**.  
+- Users can input student features in the web app and receive **predicted Math Score**.  
 
-📈 Results
-
-Achieved 88% accuracy 🎯
+**Run the app:**
+```bash
+streamlit run app.py
