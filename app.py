@@ -3,41 +3,61 @@ import pandas as pd
 import numpy as np
 import pickle
 
-model= pickle.load(open("C:/Users/admin/OneDrive/Documents/GitHub/student-performance-indicator-ml-project/models/my_model.pkl" , 'rb'))
+with open("linear_regression_model.pkl", "rb") as f:
+    model = pickle.load(f)
 
-def main():
-    st.title("Student Math Score Prediction")
+with open("onehot_encoder.pkl", "rb") as f:
+    encoder = pickle.load(f)
 
-    # User inputs
-    gender = st.selectbox("Gender", ["male", "female"])
-    ethnicity = st.selectbox("Ethnicity", ["group A", "group B", "group C", "group D", "group E"])
-    parental_education = st.selectbox("Parental Level of Education", [
-                                    "some high school", "high school", "some college", "associate's degree",
-                                    "bachelor's degree", "master's degree"])
-    lunch = st.selectbox("Lunch", ["standard", "free/reduced"])
-    prep_course = st.selectbox("Test Preparation Course", ["none", "completed"])
-    reading_score = st.number_input("Reading Score", min_value=0, max_value=100, value=72)
-    writing_score = st.number_input("Writing Score", min_value=0, max_value=100, value=74)
-    
-    new_data = pd.DataFrame({
-    "reading score": [72],
-    "writing score": [74],
-    "gender": ["female"],
-    "race/ethnicity": ["group B"],
-    "parental level of education": ["bachelor's degree"],
-    "lunch": ["standard"],
-    "test preparation course": ["none"]
+with open("scaler.pkl", "rb") as f:
+    scaler = pickle.load(f)
+
+cat_features = [
+    "gender",
+    "race/ethnicity",
+    "parental level of education",
+    "lunch",
+    "test preparation course"
+]
+
+num_features = ["reading score", "writing score"]
+
+st.title("📊Student Performance Prediction")
+
+st.write("Enter student details to predict the student's Math Score::")
+
+# Numeric Inputs
+reading_score = st.number_input("Reading Score", min_value=0.0, max_value=100.0, value=50.0)
+writing_score = st.number_input("Writing Score", min_value=0.0, max_value=100.0, value=50.0)
+
+# Categorical Inputs
+gender = st.selectbox("Gender", ["male", "female"])
+race = st.selectbox("Race/Ethnicity", ["group A", "group B", "group C", "group D", "group E"])
+parent_edu = st.selectbox("Parental Level of Education", ["some high school", "high school", "some college", "associate's degree", "bachelor's degree", "master's degree"])
+lunch = st.selectbox("Lunch", ["standard", "free/reduced"])
+test_prep = st.selectbox("Test Preparation Course", ["none", "completed"])
+
+# Create DataFrame
+input_data = pd.DataFrame({
+    "gender": [gender],
+    "race/ethnicity": [race],
+    "parental level of education": [parent_edu],
+    "lunch": [lunch],
+    "test preparation course": [test_prep],
+    "reading score": [reading_score],
+    "writing score": [writing_score]
 })
 
-    if st.button('Pridict'):
-        makeprediction = model.predict([[gender , ethnicity , parental_education , 
-                                         lunch, prep_course , reading_score , writing_score]])
-        output = round(makeprediction[0], 2)
-        st.success(f"You can get Math score: {output}")
+# Separate categorical and numerical
+X_cat = encoder.transform(input_data[cat_features]).toarray()
+X_cat_df = pd.DataFrame(X_cat, columns=encoder.get_feature_names_out(cat_features))
 
+X_num_scaled = scaler.transform(input_data[num_features])
+X_num_df = pd.DataFrame(X_num_scaled, columns=num_features)
 
-if __name__ == "__main__":
-    main()
+# Combine
+input_processed = pd.concat([X_num_df, X_cat_df], axis=1)
 
-
-
+if st.button("Predict Math Score"):
+    pred = model.predict(input_processed)[0]
+    st.success(f"Predicted Math Score: {pred:.2f}")
